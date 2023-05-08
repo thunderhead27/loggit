@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user }) {
-            if (user?.id) token._id = user.id;
+            if (user?.id) token.id = user.id;
             if (user?.name) token.name = user.name;
 
             return Promise.resolve(token);

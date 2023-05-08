@@ -11,7 +11,7 @@ export default function Navbar() {
             <li className={`font-lobster text-white text-3xl drop-shadow-3xl`}>
                 <Link href="/">Loggit</Link>
             </li >
-            {pathname === '/login' ? null :
+            {pathname === '/login' || '/profile' || '/register' ? null :
                 <li className="no-underline font-lato text-2xl font-bold text-white">
                     <Link href="/login">Login</Link>
                 </li>}

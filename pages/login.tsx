@@ -12,7 +12,7 @@ const Input = styled.input`
   width: 500px;
   border: none;
   border-radius: 40px;
-  text-align: center;
+  padding-left: 16px;
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   background-color: #323050;
@@ -42,7 +42,7 @@ export default function LoginScreen(props) {
                 email,
                 password
             });
-            if (result.error) {
+            if (result!.error) {
                 // console.log(result.error);
                 setError(true);
             }
@@ -63,7 +63,7 @@ export default function LoginScreen(props) {
     return (
         <div className="flex flex-col font-lato h-screen">
             <Layout>
-                <h1 className="mx-12 text-3xl text-white font-bold">Login</h1>
+                <h1 className="my-12 text-3xl text-white font-bold">Login</h1>
                 <form className="flex flex-col gap-y-4 bg-cOrange w-[300px] xl:w-[600px] rounded-md py-8 px-6">
                     {error && <div className="text-lg font-bold text-white">Invalid email or password.  Please try again.</div>}
                     <div className="xl:text-2xl flex flex-col">
