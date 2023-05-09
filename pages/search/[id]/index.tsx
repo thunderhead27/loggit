@@ -45,7 +45,6 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
         <div className="flex flex-col h-screen">
             <Layout>
                 <div className="flex flex-col">
-                    {console.log(query)}
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
                         <h1 className="text-3xl">{result.food_name}</h1>
                         <h1>{result.brand_name}</h1>

@@ -2,6 +2,7 @@ import Layout from "@/components/Layout";
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { getServerSession } from "next-auth/next";
+import { useSession } from "next-auth/react";
 import axios from 'axios';
 import prisma from "@/lib/prisma";
 import moment from 'moment';
@@ -57,7 +58,7 @@ const Select = ({ label, value, options, onChange }: any) => {
         <label>
             {label}
             <select value={value} onChange={onChange}>
-                {options.map((option) => (
+                {options.map((option: any) => (
                     <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
             </select>
@@ -116,6 +117,7 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
     const { control, register: register2, handleSubmit: handleSubmit2, formState: { errors: errors2 } } = useForm<FormValues2>();
 
     const router = useRouter();
+    const { data: session } = useSession();
 
     const { query } = router;
     const itemId = query.item;
@@ -329,7 +331,7 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
 
     return (
         <div className="flex flex-col font-lato h-screen text-white">
-            <Layout>
+            {session?.user ? <Layout>
                 <Search />
                 <h1 className="my-12 text-3xl text-white font-bold">Profile for {parsedDate}</h1>
                 <div className="flex flex-row">
@@ -635,7 +637,7 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                         </div>
                     </div>
                 </Modal>
-            </Layout>
+            </Layout> : <Layout>Access Denied</Layout>}
         </div>
     )
 }
@@ -661,10 +663,12 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
                 lte: todaysDate,
                 gt: yesterdaysDate
             },
+            //@ts-ignore
             userId: session?.user.id
         }
     })
 
+    //@ts-ignore
     const dailyMacro = await prisma.macro.findFirst({
         where: {
             createdAt: {
@@ -675,6 +679,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         }
     })
 
+    //@ts-ignore
     const previousDayMacro = await prisma.macro.findFirst({
         where: {
             createdAt: {
@@ -684,5 +689,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         }
     })
 
-    return { props: { meals: JSON.parse(JSON.stringify(meals)), dailyMacro: JSON.parse(JSON.stringify(dailyMacro)), previousDayMacro: JSON.parse(JSON.stringify(previousDayMacro)), userId: session?.user.id } }
+    return { props: { meals: JSON.parse(JSON.stringify(meals)), dailyMacro: JSON.parse(JSON.stringify(dailyMacro)), previousDayMacro: JSON.parse(JSON.stringify(previousDayMacro)), userId: session ? session?.user.id : null } }
 }
+
+ProfileScreen.auth = true;

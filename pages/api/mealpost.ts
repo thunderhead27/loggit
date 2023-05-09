@@ -19,6 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const newMealPost = await prisma.mealPost.create({
         data: {
+            //@ts-ignore
             userId: userId,
             foodId: itemId,
             brandName: result.brand_name,

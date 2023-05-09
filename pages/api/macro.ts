@@ -7,6 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { calories, fat, carbohydrate, protein, userId, date } = req.body
         console.log(date);
 
+        // @ts-ignore
         const newMacro = await prisma.macro.create({
             data: {
                 userId,
@@ -29,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         console.log(req.body)
 
+        //@ts-ignore
         const updatedMacro = await prisma.macro.update({
             where: {
                 id

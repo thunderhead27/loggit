@@ -18,7 +18,6 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
 
     return (
         <div className="flex flex-col h-screen">
-            {console.log(query)}
             <Layout>
                 <div className="flex flex-col items-center text-gray-50">
                     <Search />
@@ -27,7 +26,6 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
                         <div className="bg-[#323050BF] w-[600px] h-[800px] overflow-y-auto rounded-xl px-10">
                             <h2 className="text-xl text-center font-bold py-6">Branded</h2>
                             <div className="border-b-2"></div>
-                            {console.log(result)}
                             <ul className="flex flex-col">
                                 {result.branded.map((food: any, i: number) => (
                                     <li className="cursor-pointer underline mb-2" onClick={() => handleClick(food)} key={i}>{i + 1}. {food.food_name} ({food.brand_name_item_name})</li>
