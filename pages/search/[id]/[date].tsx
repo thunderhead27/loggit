@@ -1,7 +1,6 @@
 import Layout from "@/components/Layout";
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import axios from 'axios';
-import Search from "@/components/Search";
 import NutritionsFact from "@/components/NutritionFacts";
 import PieChart from "@/components/PieChart";
 import { useState } from 'react';
@@ -9,9 +8,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 
-export default function SearchItem({ result }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function SearchItemWithDate({ result }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const { data: session } = useSession();
     const router = useRouter();
+    const { query } = router;
 
     const [servings, setServings] = useState(1);
     const [weight, setWeight] = useState(Math.round(result.serving_qty * 28.3495))
@@ -37,14 +37,14 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
     }
 
     const addToFoodLog = () => {
-        router.push(`/profile?item=${result.nix_item_id}&quantity=${servings}`)
+        router.push(`/profile?item=${result.nix_item_id}&quantity=${servings}&date=${query.date}`)
     }
 
     return (
         <div className="flex flex-col h-screen">
             <Layout>
+                {console.log(query.date)}
                 <div className="flex flex-col">
-                    {console.log(result)}
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
                         <h1 className="text-3xl">{result.food_name}</h1>
                         <h1>{result.brand_name}</h1>
@@ -89,6 +89,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     const { query } = ctx;
 
     console.log(query);
+
+    console.log(query.id)
 
 
     const res = await axios.get(`https://trackapi.nutritionix.com/v2/search/item?nix_item_id=${query.id}`, {

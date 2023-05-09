@@ -6,9 +6,19 @@ import { useRouter } from 'next/router'
 
 export default function SearchScreen({ result }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const router = useRouter();
+    const { query } = router;
+
+    const handleClick = (food: any) => {
+        if (query.date) {
+            router.push(`/search/${food.nix_item_id}/${query.date}`)
+        } else {
+            router.push(`/search/${food.nix_item_id}`)
+        }
+    }
 
     return (
         <div className="flex flex-col h-screen">
+            {console.log(query)}
             <Layout>
                 <div className="flex flex-col items-center text-gray-50">
                     <Search />
@@ -20,7 +30,7 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
                             {console.log(result)}
                             <ul className="flex flex-col">
                                 {result.branded.map((food: any, i: number) => (
-                                    <li className="cursor-pointer underline mb-2" onClick={() => router.push(`/search/${food.nix_item_id}`)} key={i}>{i + 1}. {food.food_name} ({food.brand_name_item_name})</li>
+                                    <li className="cursor-pointer underline mb-2" onClick={() => handleClick(food)} key={i}>{i + 1}. {food.food_name} ({food.brand_name_item_name})</li>
                                 ))}
                             </ul>
                         </div>

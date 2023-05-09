@@ -20,19 +20,26 @@ const Input = styled.input`
 `
 
 export default function Search() {
-    const [query, setQuery] = useState('');
+    const [search, setSearch] = useState('');
     const router = useRouter();
+
+    const { query } = router;
+
 
     const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
 
-        router.push(`/search?query=${query}`);
+        if (query.date) {
+            router.push(`/search?date=${query.date}&query=${search}`)
+        }
+
+        router.push(`/search?query=${search}`);
     }
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="flex flex-row items-center"><Input type="text" id="query" name="query" value={query} onChange={e => setQuery(e.target.value)} placeholder="e.g. Macaroni and cheese" autoComplete="off" />
-                <button onClick={handleSubmit} disabled={!query}>
+            <div className="flex flex-row items-center"><Input type="text" id="query" name="query" value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. Macaroni and cheese" autoComplete="off" />
+                <button onClick={handleSubmit} disabled={!search}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="white" className="w-6 h-6 relative right-12 cursor-pointer">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>

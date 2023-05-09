@@ -1,11 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import moment from 'moment';
 import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-    const { userId, itemId, quantity, mealOfDay } = req.body;
+    const { userId, itemId, quantity, mealOfDay, todaysDate } = req.body;
 
     const response = await axios.get(`https://trackapi.nutritionix.com/v2/search/item?nix_item_id=${itemId}`, {
         headers: {
@@ -35,7 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sodium: result.nf_sodium,
             sugar: result.nf_sugars,
             fat: result.nf_total_fat,
-            category: mealOfDay
+            category: mealOfDay,
+            createdAt: todaysDate
         }
     })
 

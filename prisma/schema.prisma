@@ -35,7 +35,7 @@ model MealPost {
 model Macro {
   id  String @id @default(cuid())
   userId  String 
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  createdAt     DateTime @map(name: "created_at")
   calories  Int
   fat    Int
   carbohydrate   Int

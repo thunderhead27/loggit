@@ -4,14 +4,17 @@ import prisma from "@/lib/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { calories, fat, carbohydrate, protein, userId } = req.body
+        const { calories, fat, carbohydrate, protein, userId, date } = req.body
+        console.log(date);
+
         const newMacro = await prisma.macro.create({
             data: {
                 userId,
                 calories,
                 fat,
                 carbohydrate,
-                protein
+                protein,
+                createdAt: date
             }
         })
         res.send({
@@ -21,7 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'PUT') {
-        const { calories, fat, carbohydrate, protein, id } = req.body
+        const { calories, fat, carbohydrate, protein, id, date } = req.body
+
 
         console.log(req.body)
 

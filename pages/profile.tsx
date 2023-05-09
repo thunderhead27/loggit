@@ -13,12 +13,13 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from 'next/router';
 import Search from "@/components/Search";
 import TodaysConsumptionPieChart from "@/components/TodayConsumptionPieChart";
+import Datepicker from "react-tailwindcss-datepicker";
 
 interface Props {
     readonly open: boolean;
 }
 
-const MacroModal = styled.div<Props>`
+const Modal = styled.div<Props>`
     position: absolute;
     margin: auto auto auto auto;
     left: 0;
@@ -26,21 +27,11 @@ const MacroModal = styled.div<Props>`
     top: 0;
     bottom: 0;
     border-radius: 20px;
+    z-index: 20;
 
     ${({ open }) => (open ? `visibility: visible` : `visibility: hidden`)};
 `
 
-const MealModal = styled.div<Props>`
-    position: absolute;
-    margin: auto auto auto auto;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    border-radius: 20px;
-
-    ${({ open }) => (open ? `visibility: visible` : `visibility: hidden`)};
-`
 
 const Input = styled.input`
   font-size: 1.2rem;
@@ -91,9 +82,15 @@ interface FormValues2 {
     proteinPercentage: number
 }
 
+let todaysDate: any;
+
 export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, userId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [openMacro, setOpenMacro] = useState(false);
     const [openMeal, setOpenMeal] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+
+    const [deleteId, setDeleteId] = useState('');
+
     const [activity, setActivity] = useState("1.2");
     const [mealOfDay, setMealOfDay] = useState("breakfast");
     const [gender, setGender] = useState('male');
@@ -108,6 +105,11 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
     const [carbPercentage, setCarbPercentage] = useState(60);
     const [proteinPercentage, setProteinPercentage] = useState(10);
 
+    const [date, setDate] = useState({
+        startDate: null,
+        endDate: null
+    })
+
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues1>();
 
@@ -117,6 +119,16 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
 
     const { query } = router;
     const itemId = query.item;
+
+    if (query.date) {
+        const currentDate = query.date;
+        todaysDate = currentDate + 'T23:59:59.000Z';
+    } else {
+        todaysDate = new Date().toISOString();
+    }
+
+    const parsedDate = new Intl.DateTimeFormat("en", { year: "numeric", month: "short", day: "numeric" }).format(new Date(todaysDate))
+
     const quantity = Number(query.quantity);
 
     useEffect(() => {
@@ -179,6 +191,15 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
         setProtein(calcProtein)
     }
 
+    const onDateChange = (newValue: any) => {
+        setDate(newValue);
+        router.push(`/profile?date=${newValue.startDate}`)
+        setDate({
+            startDate: null,
+            endDate: null
+        });
+    }
+
     const onCalcSubmit: SubmitHandler<FormValues1> = (data) => {
         let tdee;
 
@@ -202,23 +223,44 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
             fat,
             carbohydrate,
             protein,
-            id: dailyMacro.id
+            id: dailyMacro.id,
         })
 
         router.reload();
     }
 
     const onMealSubmit = async () => {
-        await axios.post('/api/mealpost', {
-            userId,
-            itemId,
-            quantity,
-            mealOfDay
-        })
+        if (query.date) {
+            todaysDate = new Date(query.date + 'T23:59:59.000Z');
+            await axios.post('/api/mealpost', {
+                userId,
+                itemId,
+                quantity,
+                mealOfDay,
+                todaysDate
+            })
+            router.push(`/profile?date=${query.date}`)
 
-        router.push('/profile')
+        } else {
+            await axios.post('/api/mealpost', {
+                userId,
+                itemId,
+                quantity,
+                mealOfDay,
+                todaysDate
+            })
+            router.push('/profile')
+
+        }
+
 
         setOpenMeal(false);
+    }
+
+    const onDeleteSubmit = async (id: string) => {
+        await axios.delete(`/api/deleteMeal/${id}`)
+        setOpenDelete(false);
+        router.reload();
     }
 
     const result = [fat, protein, carbohydrate];
@@ -240,13 +282,16 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
 
     useEffect(() => {
         const addMacro = async () => {
+            const date = new Date(todaysDate).toISOString();
+
             if (!previousDayMacro) {
                 await axios.post('/api/macro', {
                     calories: 2000,
                     fat: 75,
                     carbohydrate: 300,
                     protein: 30,
-                    userId: userId
+                    userId: userId,
+                    date
                 })
             } else {
                 await axios.post('/api/macro', {
@@ -254,15 +299,18 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                     fat: previousDayMacro.fat,
                     carbohydrate: previousDayMacro.carbohydrate,
                     protein: previousDayMacro.protein,
-                    userId: userId
+                    userId: userId,
+                    date
                 })
             }
+
+            router.reload();
         }
 
         if (!dailyMacro) {
             addMacro()
         }
-    })
+    }, [dailyMacro, previousDayMacro])
 
     const breakfastCat = meals.filter((meal: any) => meal.category === 'breakfast')
     const lunchCat = meals.filter((meal: any) => meal.category === 'lunch')
@@ -273,6 +321,9 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
     const totalFat = meals.reduce((acc: any, cur: any) => acc + cur.fat, 0);
     const totalProtein = meals.reduce((acc: any, cur: any) => acc + cur.protein, 0);
     const totalCarbohydrate = meals.reduce((acc: any, cur: any) => acc + cur.carbohydrate, 0);
+    const totalSugar = meals.reduce((acc: any, cur: any) => acc + cur.sugar, 0);
+    const totalCholesterol = meals.reduce((acc: any, cur: any) => acc + cur.cholesterol, 0);
+
 
     const totalMacro = [totalFat, totalProtein, totalCarbohydrate];
 
@@ -280,23 +331,32 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
         <div className="flex flex-col font-lato h-screen text-white">
             <Layout>
                 <Search />
-                <h1 className="my-12 text-3xl text-white font-bold">Profile</h1>
+                <h1 className="my-12 text-3xl text-white font-bold">Profile for {parsedDate}</h1>
                 <div className="flex flex-row">
-                    {dailyMacro === undefined ? null :
+                    {dailyMacro === null ? null :
                         <div className="flex flex-col items-center">
-                            <h1 className="text-lg">Daily Macro</h1>
+                            <h1 className="text-lg">Diet Macro</h1>
                             <ProfilePieChart result={dailyMacro} />
                             <button className="my-12 border-2 border-white px-4 py-2" onClick={() => setOpenMacro(true)}>Change Macro</button>
                         </div>
                     }
                     {meals.length === 0 ? null :
                         <div className="flex flex-col items-center">
-                            <h1 className="text-lg">Today&apos;s Consumption</h1>
+                            <h1 className="text-lg">Today&apos;s Macro</h1>
                             <TodaysConsumptionPieChart result={totalMacro} />
                         </div>
                     }
+                    <div>
+                        <h1 className="text-lg mb-4">Total Consumption</h1>
+                        <h2>Calories: {totalCalories}</h2>
+                        <h2>Fat: {totalFat} g</h2>
+                        <h2>Carbohydrate: {totalCarbohydrate} g</h2>
+                        <h2>Sugar: {totalSugar} g</h2>
+                        <h2>Protein: {totalProtein} g</h2>
+                        <h2>Cholesterol: {totalCholesterol} mg</h2>
+                    </div>
                 </div>
-                <MacroModal open={openMacro} className="bg-gray-200 w-[300px] h-[300px] xl:w-[1000px] xl:h-[1000px]">
+                <Modal open={openMacro} className="bg-gray-200 w-[300px] h-[300px] xl:w-[1000px] xl:h-[1000px]">
                     <div className="flex flex-col items-center">
                         <div className="flex flex-col xl:flex-row gap-x-12 text-[#323050]">
                             <div className="py-12">
@@ -489,42 +549,75 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                             <button className="bg-[#45214A] px-4 py-2 rounded-md font-bold" onClick={() => setOpenMacro(false)}>Cancel</button>
                         </div>
                     </div>
-                </MacroModal>
-                <MealModal open={openMeal} className="flex flex-col items-center w-[300px] h-[300px] bg-white text-[#323050]">
+                </Modal>
+                <Modal open={openMeal} className="flex flex-col items-center w-[300px] h-[300px] bg-white text-[#323050]">
                     <h1 className="py-8 text-2xl">Add to</h1>
                     <Select className="text-3xl" options={mealOption} value={mealOfDay} onChange={handleMealChange} />
                     <button className="bg-[#45214A] text-white mt-16 py-2 px-4 rounded-md" onClick={onMealSubmit}>Ok</button>
-                </MealModal>
-                <div>
+                </Modal>
+                <div className="flex flex-col">
                     {meals ?
-                        <div className="flex flex-col gap-y-4 items-center">
-                            <div className="">
-                                <h1 className="text-xl">Breakfast</h1>
-                                <div className="border-b-2 border-white mb-4"></div>
-                                {breakfastCat.map((item: any) => (
-                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
-                                ))}
+                        <div className="flex flex-col gap-y-4 xl:flex-row gap-x-24">
+                            <div className="flex flex-col gap-y-4 items-center">
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-xl border-b-2 border-white mb-2">Breakfast</h1>
+                                    {breakfastCat.map((item: any) => (
+                                        <div className="flex flex-row mb-2 items-center" key={item.id}>
+                                            <div className="w-[300px] xl:w-[800px]" >{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                            <div className="cursor-pointer" onClick={() => { setOpenDelete(true); setDeleteId(item.id) }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-xl border-b-2 border-white mb-2">Lunch</h1>
+                                    <div className="border-b-2 border-white mb-4"></div>
+                                    {lunchCat.map((item: any) => (
+                                        <div className="flex flex-row mb-2 items-center" key={item.id}>
+                                            <div className="w-[300px] xl:w-[800px]" >{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                            <div className="cursor-pointer" onClick={() => { setOpenDelete(true); setDeleteId(item.id) }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-xl border-b-2 border-white mb-2">Dinner</h1>
+                                    <div className="border-b-2 border-white mb-4"></div>
+                                    {dinnerCat.map((item: any) => (
+                                        <div className="flex flex-row mb-2 items-center" key={item.id}>
+                                            <div className="w-[300px] xl:w-[800px]" >{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                            <div className="cursor-pointer" onClick={() => { setOpenDelete(true); setDeleteId(item.id) }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-xl border-b-2 border-white mb-2">Snacks</h1>
+                                    <div className="border-b-2 border-white mb-4"></div>
+                                    {snackCat.map((item: any) => (
+                                        <div className="flex flex-row mb-2 items-center" key={item.id}>
+                                            <div className="w-[300px] xl:w-[800px]" >{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                            <div className="cursor-pointer" onClick={() => { setOpenDelete(true); setDeleteId(item.id) }}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="">
-                                <h1 className="text-xl">Lunch</h1>
-                                <div className="border-b-2 border-white mb-4"></div>
-                                {lunchCat.map((item: any) => (
-                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
-                                ))}
-                            </div>
-                            <div className="">
-                                <h1 className="text-xl">Dinner</h1>
-                                <div className="border-b-2 border-white mb-4"></div>
-                                {dinnerCat.map((item: any) => (
-                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
-                                ))}
-                            </div>
-                            <div className="">
-                                <h1 className="text-xl">Snacks</h1>
-                                <div className="border-b-2 border-white mb-4"></div>
-                                {snackCat.map((item: any) => (
-                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
-                                ))}
+                            <div>
+                                <Datepicker asSingle={true} value={date} onChange={onDateChange} useRange={false} placeholder="MM-DD-YYYY" />
                             </div>
                         </div>
                         :
@@ -533,6 +626,15 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                         </div>
                     }
                 </div>
+                <Modal className="w-[300px] h-[200px] bg-white text-[#323050]" open={openDelete}>
+                    <div className="flex flex-col items-center gap-y-4">
+                        <h1 className="pt-8">Do you wish to delete this item?</h1>
+                        <div className="flex flex-row gap-x-8">
+                            <button className="bg-[#5D8A66] text-white mt-16 py-2 px-4 rounded-md" onClick={() => onDeleteSubmit(deleteId)}>Yes</button>
+                            <button className="bg-[#45214A] text-white mt-16 py-2 px-4 rounded-md" onClick={() => setOpenDelete(false)}>No</button>
+                        </div>
+                    </div>
+                </Modal>
             </Layout>
         </div>
     )
@@ -540,9 +642,17 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-    const session = await getServerSession(context.req, context.res, authOptions)
+    const session = await getServerSession(context.req, context.res, authOptions);
 
-    const todaysDate = new Date().toISOString()
+    if (context.query.date) {
+        const currentDate = context.query.date;
+        todaysDate = new Date(currentDate + 'T23:59:59.000Z');
+    } else {
+        todaysDate = new Date().toISOString();
+    }
+
+    console.log(todaysDate)
+
     const yesterdaysDate = moment(todaysDate).subtract(1, 'd').toISOString();
 
     const meals = await prisma.mealPost.findMany({

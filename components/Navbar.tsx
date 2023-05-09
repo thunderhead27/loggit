@@ -1,20 +1,26 @@
 import Link from "next/link"
 import { useRouter } from "next/router";
-
+import { signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
     const router = useRouter();
     const { pathname } = router;
+    const { data: session } = useSession();
+
 
     return (
         <ul className="flex flex-row justify-between list-none items-center">
             <li className={`font-lobster text-white text-3xl drop-shadow-3xl`}>
                 <Link href="/">Loggit</Link>
             </li >
-            {pathname === '/login' || '/profile' || '/register' ? null :
+            {session?.user ? <li className="no-underline font-lato text-2xl font-bold text-white">
+                <Link href="/login" onClick={() => signOut({ callbackUrl: '/' })}>Logout</Link>
+            </li> : null}
+            {pathname === '/login' || '/register' ? null :
                 <li className="no-underline font-lato text-2xl font-bold text-white">
                     <Link href="/login">Login</Link>
-                </li>}
+                </li>
+            }
         </ul>
     )
 }
