@@ -6,10 +6,12 @@ import NutritionsFact from "@/components/NutritionFacts";
 import PieChart from "@/components/PieChart";
 import { useState } from 'react';
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 
 export default function SearchItem({ result }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const { data: session } = useSession();
+    const router = useRouter();
 
     const [servings, setServings] = useState(1);
     const [weight, setWeight] = useState(Math.round(result.serving_qty * 28.3495))
@@ -32,6 +34,10 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
         setWeight(Number(e.target.value));
         const newServing = Number(e.target.value) / Math.round(result.serving_qty * 28.3495);
         setServings(newServing);
+    }
+
+    const addToFoodLog = () => {
+        router.push(`/profile?item=${result.nix_item_id}&quantity=${servings}`)
     }
 
     return (
@@ -63,7 +69,7 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
 
                         {session?.user ?
                             <div>
-                                <button>Add to food log</button>
+                                <button className="text-white font-bold border-2 border-white px-4 py-2" onClick={addToFoodLog}>Add to food log</button>
                             </div>
                             :
                             <div className="flex flex-col items-center gap-y-4 text-white">

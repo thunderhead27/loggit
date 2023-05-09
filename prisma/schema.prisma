@@ -17,7 +17,6 @@ model MealPost {
   name     String
   photoThumbnail String?
   createdAt     DateTime  @default(now()) @map(name: "created_at")
-  user    User?@relation(fields:[userId], references:[id])
   userId  String
   category  String
   servingQty  Float
@@ -79,7 +78,6 @@ model User {
   emailVerified DateTime?
   password      String
   image         String?
-  posts         MealPost[]
   accounts      Account[]
   sessions      Session[]
   }

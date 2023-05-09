@@ -11,12 +11,26 @@ import styled from 'styled-components';
 import MacroPieChart from "@/components/MacroPieChart";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from 'next/router';
+import Search from "@/components/Search";
+import TodaysConsumptionPieChart from "@/components/TodayConsumptionPieChart";
 
 interface Props {
     readonly open: boolean;
 }
 
 const MacroModal = styled.div<Props>`
+    position: absolute;
+    margin: auto auto auto auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 20px;
+
+    ${({ open }) => (open ? `visibility: visible` : `visibility: hidden`)};
+`
+
+const MealModal = styled.div<Props>`
     position: absolute;
     margin: auto auto auto auto;
     left: 0;
@@ -78,8 +92,10 @@ interface FormValues2 {
 }
 
 export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, userId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const [openMacro, setOpenMacro] = useState(false)
+    const [openMacro, setOpenMacro] = useState(false);
+    const [openMeal, setOpenMeal] = useState(false);
     const [activity, setActivity] = useState("1.2");
+    const [mealOfDay, setMealOfDay] = useState("breakfast");
     const [gender, setGender] = useState('male');
 
     const [setOwn, setSetOwn] = useState('percentage');
@@ -99,8 +115,23 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
 
     const router = useRouter();
 
+    const { query } = router;
+    const itemId = query.item;
+    const quantity = Number(query.quantity);
+
+    useEffect(() => {
+
+        if (itemId) {
+            setOpenMeal(true);
+        }
+    }, [itemId])
+
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setActivity(event.target.value);
+    };
+
+    const handleMealChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setMealOfDay(event.target.value);
     };
 
     const onGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,6 +208,19 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
         router.reload();
     }
 
+    const onMealSubmit = async () => {
+        await axios.post('/api/mealpost', {
+            userId,
+            itemId,
+            quantity,
+            mealOfDay
+        })
+
+        router.push('/profile')
+
+        setOpenMeal(false);
+    }
+
     const result = [fat, protein, carbohydrate];
 
     const activityLevel = [
@@ -185,6 +229,13 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
         { label: 'Moderately active', value: "1.55" },
         { label: 'Very active', value: "1.725" },
         { label: 'Extra active', value: "1.9" },
+    ]
+
+    const mealOption = [
+        { label: 'Breakfast', value: "breakfast" },
+        { label: 'Lunch', value: "lunch" },
+        { label: 'Dinner', value: "dinner" },
+        { label: 'Snack', value: "snack" },
     ]
 
     useEffect(() => {
@@ -213,9 +264,22 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
         }
     })
 
+    const breakfastCat = meals.filter((meal: any) => meal.category === 'breakfast')
+    const lunchCat = meals.filter((meal: any) => meal.category === 'lunch')
+    const dinnerCat = meals.filter((meal: any) => meal.category === 'dinner')
+    const snackCat = meals.filter((meal: any) => meal.category === 'snack')
+
+    const totalCalories = meals.reduce((acc: any, cur: any) => acc + cur.calories, 0);
+    const totalFat = meals.reduce((acc: any, cur: any) => acc + cur.fat, 0);
+    const totalProtein = meals.reduce((acc: any, cur: any) => acc + cur.protein, 0);
+    const totalCarbohydrate = meals.reduce((acc: any, cur: any) => acc + cur.carbohydrate, 0);
+
+    const totalMacro = [totalFat, totalProtein, totalCarbohydrate];
+
     return (
         <div className="flex flex-col font-lato h-screen text-white">
             <Layout>
+                <Search />
                 <h1 className="my-12 text-3xl text-white font-bold">Profile</h1>
                 <div className="flex flex-row">
                     {dailyMacro === undefined ? null :
@@ -225,10 +289,10 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                             <button className="my-12 border-2 border-white px-4 py-2" onClick={() => setOpenMacro(true)}>Change Macro</button>
                         </div>
                     }
-                    {meals === undefined ? null :
+                    {meals.length === 0 ? null :
                         <div className="flex flex-col items-center">
                             <h1 className="text-lg">Today&apos;s Consumption</h1>
-                            <ProfilePieChart result={meals} />
+                            <TodaysConsumptionPieChart result={totalMacro} />
                         </div>
                     }
                 </div>
@@ -426,6 +490,49 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                         </div>
                     </div>
                 </MacroModal>
+                <MealModal open={openMeal} className="flex flex-col items-center w-[300px] h-[300px] bg-white text-[#323050]">
+                    <h1 className="py-8 text-2xl">Add to</h1>
+                    <Select className="text-3xl" options={mealOption} value={mealOfDay} onChange={handleMealChange} />
+                    <button className="bg-[#45214A] text-white mt-16 py-2 px-4 rounded-md" onClick={onMealSubmit}>Ok</button>
+                </MealModal>
+                <div>
+                    {meals ?
+                        <div className="flex flex-col gap-y-4 items-center">
+                            <div className="">
+                                <h1 className="text-xl">Breakfast</h1>
+                                <div className="border-b-2 border-white mb-4"></div>
+                                {breakfastCat.map((item: any) => (
+                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                ))}
+                            </div>
+                            <div className="">
+                                <h1 className="text-xl">Lunch</h1>
+                                <div className="border-b-2 border-white mb-4"></div>
+                                {lunchCat.map((item: any) => (
+                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                ))}
+                            </div>
+                            <div className="">
+                                <h1 className="text-xl">Dinner</h1>
+                                <div className="border-b-2 border-white mb-4"></div>
+                                {dinnerCat.map((item: any) => (
+                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                ))}
+                            </div>
+                            <div className="">
+                                <h1 className="text-xl">Snacks</h1>
+                                <div className="border-b-2 border-white mb-4"></div>
+                                {snackCat.map((item: any) => (
+                                    <div key={item.id}>{item.servingQty === 1 ? '1' : item.servingQty} <span className="underline">{item.name} ({item.brandName})</span> {item.calories} calories, {item.fat} g fat,  {item.protein} g protein, {item.carbohydrate} g carbohydrate, {item.sugar} g sugar, {item.cholesterol} mg cholesterol</div>
+                                ))}
+                            </div>
+                        </div>
+                        :
+                        <div className="text-white font-bold">
+                            <p>Your log is empty.  Fill it with something!</p>
+                        </div>
+                    }
+                </div>
             </Layout>
         </div>
     )
@@ -441,7 +548,8 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const meals = await prisma.mealPost.findMany({
         where: {
             createdAt: {
-                gte: todaysDate
+                lte: todaysDate,
+                gt: yesterdaysDate
             },
             userId: session?.user.id
         }
