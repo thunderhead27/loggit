@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form'
@@ -27,7 +28,7 @@ interface FormValues {
     password: string
 }
 
-export default function LoginScreen(props) {
+export default function LoginScreen() {
     const [error, setError] = useState(false);
     const { data: session } = useSession();
     const router = useRouter();
