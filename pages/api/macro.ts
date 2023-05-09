@@ -15,11 +15,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         })
         res.send({
-            message: 'Macro updated successfully',
+            message: 'Macro created successfully',
             newMacro
         })
     }
 
+    if (req.method === 'PUT') {
+        const { calories, fat, carbohydrate, protein, id } = req.body
+
+        console.log(req.body)
+
+        const updatedMacro = await prisma.macro.update({
+            where: {
+                id
+            },
+            data: {
+                calories,
+                fat,
+                carbohydrate,
+                protein
+            }
+        })
+        res.send({
+            message: 'Macro updated successfully',
+            updatedMacro
+        })
+    }
 
 
 

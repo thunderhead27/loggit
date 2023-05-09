@@ -1,4 +1,4 @@
-@tailwind base;
+@tailwind base; 
 @tailwind components;
 @tailwind utilities;
 
@@ -14,4 +14,10 @@
     radial-gradient(at bottom left, #1A6566, transparent);
   background-size: 100% 100%;
   background-repeat: no-repeat;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
