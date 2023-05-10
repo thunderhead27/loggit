@@ -43,7 +43,6 @@ export default function SearchItemWithDate({ result }: InferGetServerSidePropsTy
     return (
         <div className="flex flex-col h-screen">
             <Layout>
-                {console.log(query.date)}
                 <div className="flex flex-col">
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
                         <h1 className="text-3xl">{result.food_name}</h1>
