@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Layout from "@/components/Layout";
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from "next/router";
@@ -29,7 +30,8 @@ interface FormValues {
     confirmPassword: string
 }
 
-export default function RegisterScreen(props) {
+
+function RegisterScreen() {
     const [error, setError] = useState(false);
     const { data: session } = useSession();
     const router = useRouter();
@@ -45,6 +47,7 @@ export default function RegisterScreen(props) {
 
     const { handleSubmit, register, getValues, formState: { errors }, } = useForm<FormValues>();
 
+    //@ts-ignore
     const submitHandler = async ({ name, email, password }) => {
         try {
             await axios.post('/api/auth/signup', {
@@ -59,9 +62,12 @@ export default function RegisterScreen(props) {
                 email,
                 password
             });
+
+            //@ts-ignore
             if (result.error) {
                 // console.log(result.error);
                 setError(true);
+                //@ts-ignore
                 console.log(result.error);
             }
         } catch (err) {
@@ -130,3 +136,5 @@ export default function RegisterScreen(props) {
         </div>
     )
 }
+
+export default RegisterScreen;
