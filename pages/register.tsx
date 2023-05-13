@@ -89,7 +89,7 @@ export default function RegisterScreen(props) {
                 <form className="flex flex-col gap-y-4 bg-cOrange w-[300px] xl:w-[600px] rounded-md py-8">
                     {error && <div className="text-lg font-bold">User already exists.</div>}
                     <div className="xl:text-2xl flex flex-row gap-x-6">
-                        <div>
+                        <div className="flex flex-col">
                             <label className="font-bold text-xl" htmlFor="firstName">Name</label>
                             <Input type="text" {...register('name', {
                                 required: true
@@ -99,7 +99,7 @@ export default function RegisterScreen(props) {
                             }
                         </div>
                     </div>
-                    <div className="xl:text-2xl">
+                    <div className="xl:text-2xl flex flex-col">
                         <label className="font-bold text-xl" htmlFor="email">Email</label>
                         <Input type="email" {...register('email', {
                             required: true, pattern: {
@@ -111,7 +111,7 @@ export default function RegisterScreen(props) {
                             <div className="text-xs absolute font-bold">Please enter email</div>
                         }
                     </div>
-                    <div className="xl:text-2xl">
+                    <div className="xl:text-2xl flex flex-col">
                         <label className="font-bold text-xl" htmlFor="password">Password</label>
                         <Input type="password" {...register('password', {
                             required: 'Please enter password',
@@ -121,7 +121,7 @@ export default function RegisterScreen(props) {
                             <div className="text-xs absolute font-bold">{errors.password.message}</div>
                         }
                     </div>
-                    <div className="xl:text-2xl">
+                    <div className="xl:text-2xl flex flex-col">
                         <label className="font-bold text-xl" htmlFor="confirmPassword">Confirm Password</label>
                         <Input type="password" {...register('confirmPassword', {
                             required: 'Please enter password',

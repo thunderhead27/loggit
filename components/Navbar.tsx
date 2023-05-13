@@ -15,12 +15,11 @@ export default function Navbar() {
             </li >
             {session?.user ? <li className="no-underline pr-4 font-lato text-2xl font-bold text-white">
                 <Link href="/login" onClick={() => signOut({ callbackUrl: '/' })}>Logout</Link>
-            </li> : null}
-            {pathname === '/login' || '/register' ? null :
-                <li className="no-underline font-lato text-2xl font-bold text-white">
-                    <Link href="/login">Login</Link>
-                </li>
+            </li> : <li className="no-underline font-lato text-2xl font-bold text-white">
+                <Link href="/login">Login</Link>
+            </li>
             }
+
         </ul>
     )
 }

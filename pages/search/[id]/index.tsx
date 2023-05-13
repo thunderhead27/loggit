@@ -42,7 +42,7 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col xl:h-screen">
             <Layout>
                 <div className="flex flex-col">
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
