@@ -41,14 +41,14 @@ export default function SearchItemWithDate({ result }: InferGetServerSidePropsTy
     }
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col">
             <Layout>
                 <div className="flex flex-col">
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
                         <h1 className="text-3xl">{result.food_name}</h1>
                         <h1>{result.brand_name}</h1>
                     </div>
-                    <div className="flex flex-col xl:flex-row gap-x-12">
+                    <div className="flex flex-col xl:flex-row gap-x-12 gap-y-8">
                         <NutritionsFact result={result} weight={weight} servings={servings} />
                         <div className="w-[300px]">
                             <PieChart result={result} />
@@ -67,7 +67,7 @@ export default function SearchItemWithDate({ result }: InferGetServerSidePropsTy
                         </div>
 
                         {session?.user ?
-                            <div>
+                            <div className="mb-12">
                                 <button className="text-white font-bold border-2 border-white px-4 py-2" onClick={addToFoodLog}>Add to food log</button>
                             </div>
                             :
