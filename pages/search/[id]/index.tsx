@@ -73,9 +73,9 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
                             </div>
                             :
                             <div className="flex flex-col items-center gap-y-4 text-white">
-                                <button className="text-white text-lg border-2 border-white px-4 py-2">Login to add to food log</button>
+                                <button className="text-white text-lg border-2 border-white px-4 py-2" onClick={() => router.push('/login')}>Login to add to food log</button>
                                 or
-                                <button className="text-white text-lg border-2 border-white px-4 py-2">Sign up</button>
+                                <button className="text-white text-lg border-2 border-white px-4 py-2" onClick={() => router.push('/register')}>Sign up</button>
                             </div>
                         }
                     </div>
