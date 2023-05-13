@@ -42,7 +42,7 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
     }
 
     return (
-        <div className="flex flex-col xl:h-screen">
+        <div className="flex flex-col">
             <Layout>
                 <div className="flex flex-col">
                     <div className="flex flex-col font-lato text-center my-12 text-white font-bold">
@@ -72,7 +72,7 @@ export default function SearchItem({ result }: InferGetServerSidePropsType<typeo
                                 <button className="text-white font-bold border-2 border-white px-4 py-2" onClick={addToFoodLog}>Add to food log</button>
                             </div>
                             :
-                            <div className="flex flex-col items-center gap-y-4 text-white">
+                            <div className="flex flex-col items-center gap-y-4 text-white mb-12">
                                 <button className="text-white text-lg border-2 border-white px-4 py-2" onClick={() => router.push('/login')}>Login to add to food log</button>
                                 or
                                 <button className="text-white text-lg border-2 border-white px-4 py-2" onClick={() => router.push('/register')}>Sign up</button>
