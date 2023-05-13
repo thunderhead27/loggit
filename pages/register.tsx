@@ -95,7 +95,7 @@ export default function RegisterScreen(props) {
                                 required: true
                             })} className="w-full focus:outline-none rounded-sm" id="firstName" autoFocus></Input>
                             {errors.name &&
-                                <div className="text-xs absolute font-bold">Please enter name</div>
+                                <div className="text-xs font-bold">Please enter name</div>
                             }
                         </div>
                     </div>
@@ -108,7 +108,7 @@ export default function RegisterScreen(props) {
                             }
                         })} className="w-full focus:outline-none rounded-sm" id="email" autoFocus></Input>
                         {errors.email &&
-                            <div className="text-xs absolute font-bold">Please enter email</div>
+                            <div className="text-xs font-bold">Please enter email</div>
                         }
                     </div>
                     <div className="xl:text-2xl flex flex-col">
@@ -118,7 +118,7 @@ export default function RegisterScreen(props) {
                             minLength: { value: 6, message: 'Password is more than 5 characters' }
                         })} className="w-full focus:outline-none rounded-sm" id="password" autoFocus></Input>
                         {errors.password &&
-                            <div className="text-xs absolute font-bold">{errors.password.message}</div>
+                            <div className="text-xs font-bold">{errors.password.message}</div>
                         }
                     </div>
                     <div className="xl:text-2xl flex flex-col">
@@ -129,10 +129,10 @@ export default function RegisterScreen(props) {
                             minLength: { value: 6, message: 'Password is more than 5 characters' }
                         })} className="w-full focus:outline-none rounded-sm" id="confirmPassword" autoFocus></Input>
                         {errors.confirmPassword &&
-                            <div className="text-xs absolute font-bold">{errors.confirmPassword.message}</div>
+                            <div className="text-xs font-bold">{errors.confirmPassword.message}</div>
                         }
                         {errors.confirmPassword && errors.confirmPassword.type === 'validate' &&
-                            <div className="text-xs absolute font-bold">PASSWORDS DO NOT MATCH</div>
+                            <div className="text-xs font-bold">PASSWORDS DO NOT MATCH</div>
                         }
                     </div>
                     <div>

@@ -83,7 +83,7 @@ export default function LoginScreen(props) {
                                 }
                             })} id="email" autoFocus></Input>
                             {errors.email &&
-                                <div className="text-xs absolute font-bold">{errors.email.message}</div>
+                                <div className="text-xs text-white font-bold">{errors.email.message}</div>
                             }
                         </div>
                         <div className="xl:text-2xl flex flex-col">
@@ -93,7 +93,7 @@ export default function LoginScreen(props) {
                                 minLength: { value: 6, message: 'Password is more than 5 characters' }
                             })} id="password" autoFocus></Input>
                             {errors.password &&
-                                <div className="text-xs absolute font-bold">{errors.password.message}</div>
+                                <div className="text-xs text-white font-bold">{errors.password.message}</div>
                             }
                         </div>
                         <div>
