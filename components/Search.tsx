@@ -14,6 +14,11 @@ const Input = styled.input`
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   background-color: #323050;
 
+   @media (max-width: 768px) {
+    font-size: 1.2rem;
+    width: 300px;
+  }
+
   :focus {
     outline: none;
 }
@@ -38,9 +43,10 @@ export default function Search() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="flex flex-row items-center"><Input type="text" id="query" name="query" value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. Macaroni and cheese" autoComplete="off" />
+            <div className="flex flex-row items-center">
+                <Input type="text" id="query" name="query" value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. Macaroni and cheese" autoComplete="off" />
                 <button onClick={handleSubmit} disabled={!search}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="white" className="w-6 h-6 relative right-12 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="white" className="w-4 h-4 xl:w-6 xl:h-6 relative right-8 xl:right-12 cursor-pointer">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
                 </button>

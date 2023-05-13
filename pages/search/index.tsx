@@ -20,7 +20,9 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
         <div className="flex flex-col h-screen">
             <Layout>
                 <div className="flex flex-col items-center text-gray-50">
-                    <Search />
+                    <div className="pt-12">
+                        <Search />
+                    </div>
                     <h1 className="mt-12 py-12 text-3xl">Search Results</h1>
                     <div className="flex flex-col xl:flex-row justify-between gap-x-[200px]">
                         <div className="bg-[#323050BF] w-[600px] h-[800px] overflow-y-auto rounded-xl px-10">

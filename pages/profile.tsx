@@ -330,11 +330,13 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
     const totalMacro = [totalFat, totalProtein, totalCarbohydrate];
 
     return (
-        <div className="flex flex-col font-lato h-screen text-white">
+        <div className="flex flex-col font-lato text-white">
             {session?.user ? <Layout>
-                <Search />
+                <div className="pt-12">
+                    <Search />
+                </div>
                 <h1 className="my-12 text-3xl text-white font-bold">Profile for {parsedDate}</h1>
-                <div className="flex flex-row">
+                <div className="flex flex-col gap-y-8 xl:flex-row xl:w-[1000px] justify-between">
                     {dailyMacro === null ? null :
                         <div className="flex flex-col items-center">
                             <h1 className="text-lg">Diet Macro</h1>
@@ -557,7 +559,7 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                     <Select className="text-3xl" options={mealOption} value={mealOfDay} onChange={handleMealChange} />
                     <button className="bg-[#45214A] text-white mt-16 py-2 px-4 rounded-md" onClick={onMealSubmit}>Ok</button>
                 </Modal>
-                <div className="flex flex-col">
+                <div className="flex flex-col py-12">
                     {meals ?
                         <div className="flex flex-col gap-y-4 xl:flex-row gap-x-24">
                             <div className="flex flex-col gap-y-4 items-center">
@@ -618,7 +620,8 @@ export default function ProfileScreen({ meals, dailyMacro, previousDayMacro, use
                                     ))}
                                 </div>
                             </div>
-                            <div>
+                            <div className="flex flex-col items-center gap-y-4">
+                                <h1>Calendar</h1>
                                 <Datepicker asSingle={true} value={date} onChange={onDateChange} useRange={false} placeholder="MM-DD-YYYY" />
                             </div>
                         </div>

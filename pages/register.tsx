@@ -18,8 +18,15 @@ const Input = styled.input`
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   background-color: #323050;
 
+   @media (max-width: 768px) {
+    font-size: 1.2rem;
+    width: 300px;
+  }
+
   :focus {
     outline: none;
+
+    
 }
 `
 
@@ -30,8 +37,8 @@ interface FormValues {
     confirmPassword: string
 }
 
-
-function RegisterScreen() {
+//@ts-ignore
+export default function RegisterScreen(props) {
     const [error, setError] = useState(false);
     const { data: session } = useSession();
     const router = useRouter();
@@ -79,7 +86,7 @@ function RegisterScreen() {
         <div className="flex flex-col h-screen text-white">
             <Layout>
                 <h1 className="mx-12 text-3xl text-white font-bold">Sign Up</h1>
-                <form className="flex flex-col gap-y-4 bg-cOrange w-[300px] xl:w-[600px] rounded-md py-8 px-6">
+                <form className="flex flex-col gap-y-4 bg-cOrange w-[300px] xl:w-[600px] rounded-md py-8">
                     {error && <div className="text-lg font-bold">User already exists.</div>}
                     <div className="xl:text-2xl flex flex-row gap-x-6">
                         <div>
@@ -136,5 +143,3 @@ function RegisterScreen() {
         </div>
     )
 }
-
-export default RegisterScreen;

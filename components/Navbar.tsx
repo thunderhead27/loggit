@@ -10,10 +10,10 @@ export default function Navbar() {
 
     return (
         <ul className="flex flex-row justify-between list-none items-center">
-            <li className={`font-lobster text-white text-3xl drop-shadow-3xl`}>
+            <li className={`font-lobster text-white px-8 text-3xl drop-shadow-3xl`}>
                 <Link href="/">Loggit</Link>
             </li >
-            {session?.user ? <li className="no-underline font-lato text-2xl font-bold text-white">
+            {session?.user ? <li className="no-underline pr-4 font-lato text-2xl font-bold text-white">
                 <Link href="/login" onClick={() => signOut({ callbackUrl: '/' })}>Logout</Link>
             </li> : null}
             {pathname === '/login' || '/register' ? null :
