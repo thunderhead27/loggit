@@ -14,8 +14,8 @@ export default function Navbar() {
                 <Link href="/">Loggit</Link>
             </li >
             {session?.user ? <li className="no-underline pr-4 font-lato text-2xl font-bold text-white">
-                <Link href="/login" onClick={() => signOut({ callbackUrl: '/' })}>Logout</Link>
-            </li> : <li className="no-underline font-lato text-2xl font-bold text-white">
+                <button className="pr-4" onClick={() => signOut({ callbackUrl: '/' })}>Logout</button>
+            </li> : <li className="no-underline font-lato text-2xl font-bold text-white pr-4">
                 <Link href="/login">Login</Link>
             </li>
             }
