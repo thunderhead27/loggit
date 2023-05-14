@@ -17,9 +17,9 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col xl:h-screen">
             <Layout>
-                <div className="flex flex-col items-center text-gray-50 xl:h-screen">
+                <div className="flex flex-col items-center text-gray-50 ">
                     <div className="pt-12">
                         <Search />
                     </div>
