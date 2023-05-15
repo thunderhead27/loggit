@@ -25,7 +25,7 @@ export default function SearchScreen({ result }: InferGetServerSidePropsType<typ
                     </div>
                     <h1 className="mt-12 py-12 text-3xl">Search Results</h1>
                     <div className="flex flex-col xl:flex-row justify-between gap-x-[200px]">
-                        <div className="bg-[#323050BF] xl:w-[600px] h-[800px] overflow-y-auto rounded-xl px-10 w-[300px] mb-12">
+                        <div className="bg-[#323050BF] xl:w-[1200px] h-[800px] overflow-y-auto rounded-xl px-10 w-[300px] mb-12">
                             <h2 className="text-xl text-center font-bold py-6">Branded</h2>
                             <div className="border-b-2"></div>
                             <ul className="flex flex-col">
