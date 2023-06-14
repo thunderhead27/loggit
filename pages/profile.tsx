@@ -421,7 +421,7 @@ export default function ProfileScreen({
                 <TodaysConsumptionPieChart result={totalMacro} />
               </div>
             )}
-            <div>
+            <div className="flex flex-col border-2 border-white p-4">
               <h1 className="text-lg mb-4">Total Consumption</h1>
               <h2>Calories: {totalCalories}</h2>
               <h2>Fat: {totalFat} g</h2>
