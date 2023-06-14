@@ -387,9 +387,21 @@ export default function ProfileScreen({
           <div className="pt-12">
             <Search />
           </div>
-          <h1 className="my-12 text-3xl text-white font-bold">
-            Profile for {parsedDate}
-          </h1>
+          <div className="flex flex-row items-center gap-x-8">
+            <h1 className="my-12 text-3xl text-white font-bold">
+              Profile for {parsedDate}
+            </h1>
+            <div>
+              <Datepicker
+                asSingle={true}
+                value={date}
+                onChange={onDateChange}
+                useRange={false}
+                placeholder="MM-DD-YYYY"
+              />
+            </div>
+          </div>
+
           <div className="flex flex-col gap-y-8 xl:flex-row xl:w-[1000px] justify-between">
             {dailyMacro === null ? null : (
               <div className="flex flex-col items-center">
@@ -980,16 +992,6 @@ export default function ProfileScreen({
                       </div>
                     ))}
                   </div>
-                </div>
-                <div className="flex flex-col items-center gap-y-4">
-                  <h1>Calendar</h1>
-                  <Datepicker
-                    asSingle={true}
-                    value={date}
-                    onChange={onDateChange}
-                    useRange={false}
-                    placeholder="MM-DD-YYYY"
-                  />
                 </div>
               </div>
             ) : (
