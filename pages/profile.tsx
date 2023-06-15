@@ -817,7 +817,7 @@ export default function ProfileScreen({
                     <div className="border-b-2 border-white mb-4">
                       {breakfastCat.map((item: any) => (
                         <div
-                          className="flex flex-row mb-4 items-center"
+                          className="flex flex-row items-center"
                           key={item.id}
                         >
                           <div className="w-[300px] xl:w-[800px]">
