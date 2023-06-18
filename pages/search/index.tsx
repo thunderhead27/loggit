@@ -23,7 +23,7 @@ export default function SearchScreen({
   };
 
   return (
-    <div className="flex flex-col xl:h-screen">
+    <div className="flex flex-col xl:min-h-screen">
       <Layout>
         <div className="flex flex-col items-center text-gray-50 ">
           <div className="pt-12">
