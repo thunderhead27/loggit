@@ -381,7 +381,7 @@ export default function ProfileScreen({
   const totalMacro = [totalFat, totalProtein, totalCarbohydrate];
 
   return (
-    <div className="flex flex-col font-lato text-white xl:h-screen">
+    <div className="flex flex-col font-lato text-white">
       {session?.user ? (
         <Layout>
           <div className="pt-12">
