@@ -11,7 +11,11 @@ export default function NutritionsFact({
       <h1 className="text-4xl font-black tracking-tighter">Nutrition Facts</h1>
       <div className="border-b border-black"></div>
       <div className="flex flex-row justify-between font-black tracking-tighter">
-        <div>{servings <= 1 ? "1 Serving" : `${servings} Servings`}</div>
+        <div>
+          {servings <= 1
+            ? `${servings.toFixed(2)} Serving`
+            : `${Math.round(servings)} Servings`}
+        </div>
         <div>({weight}g)</div>
       </div>
       <div className="border-8 border-black my-1"></div>
@@ -84,7 +88,7 @@ export default function NutritionsFact({
       <div className="border border-gray-400"></div>
       <div className="flex flex-row justify-between">
         <div className="text-sm pl-4">
-          Dietary Fiber {result.nf_dietary_fiber * servings}g
+          Dietary Fiber {Math.round(result.nf_dietary_fiber * servings)}g
         </div>
         <div className="font-black tracking-tighter">
           {Math.round((result.nf_dietary_fiber * servings * 100) / 28)}%
@@ -93,7 +97,7 @@ export default function NutritionsFact({
       <div className="border border-gray-400"></div>
       <div className="flex flex-row justify-between">
         <div className="text-sm pl-4">
-          Total Sugar {result.nf_sugars * servings}g
+          Total Sugar {Math.round(result.nf_sugars * servings)}g
         </div>
       </div>
       <div className="border border-gray-400"></div>
